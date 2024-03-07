@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Web para testiar mi API REST</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <style>
+      article {
+        border: 1px solid #111;
+        padding: 20px;
+      }
+
+      img {
+        width: 350px;
+        height: 100%;
+      }
+
+    </style>
+    <script type='module'>
+      fetch('http://localhost:1234/movies')
+        .then(res => res.json())
+        .then(movies => {
+          const html = movies.map(movie => {
+            return `
+            <article data-id=${movie.id}>
+              <h2>${movie.title}</h2>
+              <img src="${movie.poster}" alt="${movie.title}" />
+              <p>${movie.director}</p>
+              <button>Eliminar</button>
+            </article>
+            `
+          }).join('')
+          document.querySelector('main').innerHTML = html
+        })
+      document.addEventListener('click', (e) => {
+        if(e.target.matches('button')) {
+          const article = e.target.closest('article')
+          const id = article.dataset.id
+
+          fetch(`http://localhost:1234/movies/${id}`, {method: 'DELETE'})
+          .then(res => {
+            if(res.ok) {
+              article.remove()
+            } 
+          })
+        }
+      })
+    </script>
+  </head>
+  <body>
+    <main></main>
+  </body>
+</html>

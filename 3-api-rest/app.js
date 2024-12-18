@@ -1,30 +1,29 @@
 const express = require('express')
 const cors = require('cors')
 const movies = require('./movies.json')
-const { validateMovie, validateParcialMovie } = require('./schemas/movies.js')
+const { validateMovie, validateParcialMovie } = require('./schemas/movies.js').default
 
 const port = process.env.PORT || 1234
 
-const ACCEPTED_URL = [
-  'http://localhost:8080',
-  'http:localhost:1234'
-]
+const ACCEPTED_URL = ['http://localhost:8080', 'http:localhost:1234']
 
 const app = express()
 app.use(express.json())
-app.use(cors({
-  origin: (origin, callback) => {
-    if (ACCEPTED_URL.includes(origin)) {
-      return callback(null, true)
-    }
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (ACCEPTED_URL.includes(origin)) {
+        return callback(null, true)
+      }
 
-    if (!origin) {
-      return callback(null, true)
-    }
+      if (!origin) {
+        return callback(null, true)
+      }
 
-    callback(new Error('Not allowed by CORS'))
-  }
-}))
+      callback(new Error('Not allowed by CORS'))
+    }
+  })
+)
 app.disable('x-powered-by')
 
 app.get('/', (req, res) => {
@@ -34,10 +33,8 @@ app.get('/', (req, res) => {
 app.get('/movies', (req, res) => {
   const { genre } = req.query
   if (genre) {
-    const filteredMovies = movies.filter(
-      movie => movie.genre.some(
-        g => g.toLowerCase() === genre.toLowerCase()
-      )
+    const filteredMovies = movies.filter((movie) =>
+      movie.genre.some((g) => g.toLowerCase() === genre.toLowerCase())
     )
     return res.json({ movies: filteredMovies, amount: filteredMovies.length })
   }
@@ -46,7 +43,7 @@ app.get('/movies', (req, res) => {
 
 app.get('/movies/:id', (req, res) => {
   const { id } = req.params
-  const movie = movies.find(movie => movie.id === id)
+  const movie = movies.find((movie) => movie.id === id)
   if (movie) return res.json(movie)
   res.status(404).json({ error: 'Movie not found' })
 })
@@ -70,7 +67,7 @@ app.post('/movies', (req, res) => {
 
 app.patch('/movies/:id', (req, res) => {
   const { id } = req.params
-  const movieIndex = movies.findIndex(movie => movie.id === id)
+  const movieIndex = movies.findIndex((movie) => movie.id === id)
 
   if (movieIndex === -1) {
     return res.status(404).json({ error: 'Movie not found' })
@@ -92,7 +89,7 @@ app.patch('/movies/:id', (req, res) => {
 app.delete('/movies/:id', (req, res) => {
   const { id } = req.params
   console.log('id', id)
-  const movieIndex = movies.findIndex(movie => movie.id === id)
+  const movieIndex = movies.findIndex((movie) => movie.id === id)
   if (movieIndex === -1) {
     return res.status(404).json({ error: 'Movie not found' })
   }
